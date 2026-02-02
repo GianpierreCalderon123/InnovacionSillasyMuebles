@@ -3,149 +3,151 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Innovación de Sillas y Muebles</title>
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <title>Admin | Innovación de Sillas y Muebles</title>
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap topbar__inner">
-      <a class="brand" href="./">
-        <span class="brand__logo">IS</span>
-        <span class="brand__text">
-          <strong>Innovación</strong><br><small>Sillas y Muebles</small>
-        </span>
-      </a>
+  <header class="bar">
+    <div class="wrap bar__inner">
+      <div>
+        <h1>Admin</h1>
+        <p class="muted">
+          Crea categorías y productos. Puedes <strong>importar</strong> desde <code>/data/products.json</code>
+          y <strong>guardar en servidor</strong> para actualizarlo directamente.
+        </p>
+      </div>
 
-      <nav class="nav">
-        <a href="#catalogo">Catálogo</a>
-        <a href="#nosotros">Nosotros</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-
-      <div class="topbar__actions">
-        <a class="btn btn--ghost" href="admin/">Admin</a>
-        <a class="btn btn--wa" id="waTop" target="_blank" rel="noopener">WhatsApp</a>
+      <div class="bar__actions">
+        <a class="btn" href="../">← Volver a la web</a>
+        <button class="btn" id="btnImport" type="button">Importar products.json</button>
+        <button class="btn btn--primary" id="btnSaveServer" type="button">Guardar en servidor</button>
+        <button class="btn" id="btnExport" type="button">Exportar products.json</button>
       </div>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="wrap hero__inner">
-        <div class="hero__copy">
-          <h1>Sillas y muebles con estilo para hogar y oficina</h1>
-          <p>
-            Explora nuestro catálogo por categorías: <strong>Sillas</strong>, <strong>Bancos</strong>,
-            <strong>Mesas</strong>, <strong>Sillas de oficina</strong> y <strong>Butacas</strong>.
-          </p>
-
-          <div class="hero__cta">
-            <a class="btn btn--primary" href="#catalogo">Ver catálogo</a>
-            <a class="btn btn--ghost" id="waHero" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          </div>
-
-          <div class="hero__chips" id="chipRow"></div>
-        </div>
-
-        <div class="hero__card">
-          <div class="hero__cardTop">
-            <span class="pill">Atención rápida</span>
-            <span class="pill pill--soft">Envíos / recojo</span>
-          </div>
-          <div class="hero__cardBody">
-            <h3>¿Necesitas asesoría?</h3>
-            <p>Envíanos el modelo por WhatsApp y te respondemos con stock, colores y ficha técnica.</p>
-            <div class="hero__cardBtns">
-              <a class="btn btn--wa" id="waCard1" target="_blank" rel="noopener">WhatsApp principal</a>
-              <a class="btn btn--ghost" id="waCard2" target="_blank" rel="noopener">WhatsApp alterno</a>
-            </div>
-            <small class="muted">
-              *Si el número alterno no es +51, edítalo en <code>assets/js/app.js</code>.
-            </small>
+  <main class="wrap grid">
+    <section class="card card--full">
+      <h2>Seguridad</h2>
+      <p class="muted">
+        Para guardar en servidor se requiere una clave simple (password). Esta clave se valida en <code>save.php</code>.
+      </p>
+      <div class="two">
+        <label>
+          Clave de admin
+          <input id="adminKey" type="password" placeholder="Ingresa tu clave" />
+          <small class="muted">La clave no se publica en el código del catálogo, solo se usa aquí para guardar.</small>
+        </label>
+        <div class="hintBox">
+          <div class="hintTitle">Tip</div>
+          <div class="muted">
+            Si no quieres clave, te indico qué líneas borrar (es 1 minuto).
           </div>
         </div>
       </div>
     </section>
 
-    <section id="catalogo" class="section">
-      <div class="wrap">
-        <div class="section__head">
-          <div>
-            <h2>Catálogo</h2>
-            <p class="muted">Filtra por categoría o busca por nombre.</p>
-          </div>
+    <section class="card">
+      <h2>Categorías</h2>
 
-          <div class="filters">
-            <div class="search">
-              <input id="q" type="search" placeholder="Buscar… (ej: taburete, mesa, gerencial)" />
-            </div>
-            <select id="catSelect" aria-label="Categoría">
-              <option value="all">Todas las categorías</option>
-            </select>
-          </div>
+      <form id="catForm" class="form">
+        <label>
+          ID (url-friendly)
+          <input id="catId" placeholder="ej: sillas-oficina" required />
+        </label>
+        <label>
+          Nombre
+          <input id="catName" placeholder="Sillas de oficina" required />
+        </label>
+        <div class="row">
+          <button class="btn btn--primary" type="submit">Agregar / Actualizar</button>
+          <button class="btn" type="button" id="btnCatClear">Limpiar</button>
         </div>
+      </form>
 
-        <div id="grid" class="grid"></div>
-
-        <div id="empty" class="empty hidden">
-          <h3>No encontramos productos</h3>
-          <p class="muted">Prueba con otra búsqueda o selecciona otra categoría.</p>
-        </div>
-      </div>
+      <div id="catList" class="list"></div>
     </section>
 
-    <section id="nosotros" class="section section--soft">
-      <div class="wrap">
-        <h2>Nosotros</h2>
-        <p>
-          En <strong>Innovación de Sillas y Muebles</strong> nos enfocamos en mobiliario funcional,
-          resistente y con buen diseño para hogar, restaurantes y oficina.
-        </p>
-      </div>
+    <section class="card">
+      <h2>Productos</h2>
+
+      <form id="prodForm" class="form">
+        <label>
+          ID (único)
+          <input id="pId" placeholder="ej: silla-nordica-01" required />
+        </label>
+
+        <label>
+          Nombre
+          <input id="pName" placeholder="Silla Nórdica Modelo N1" required />
+        </label>
+
+        <div class="two">
+          <label>
+            Categoría
+            <select id="pCat"></select>
+          </label>
+          <label>
+            Precio (PEN) (0 = Cotizar)
+            <input id="pPrice" type="number" min="0" step="1" value="0" />
+          </label>
+        </div>
+
+        <label>
+          Descripción corta
+          <textarea id="pDesc" rows="2" placeholder="Breve descripción del producto"></textarea>
+        </label>
+
+        <label>
+          Características (una por línea)
+          <textarea id="pFeat" rows="4" placeholder="Estructura resistente&#10;Fácil limpieza&#10;..."></textarea>
+        </label>
+
+        <div class="two">
+          <label>
+            Imagen (solo sugerencia de ruta)
+            <input id="pImg" type="file" accept="image/*" />
+            <small class="muted">Copia el archivo a <code>assets/img/</code>.</small>
+          </label>
+
+          <label>
+            Ficha técnica (PDF)
+            <input id="pPdf" type="file" accept="application/pdf" />
+            <small class="muted">Copia el PDF a <code>assets/fichas/</code>.</small>
+          </label>
+        </div>
+
+        <div class="two">
+          <label>
+            Ruta imagen (editable)
+            <input id="pImgPath" placeholder="assets/img/archivo.jpg" />
+          </label>
+          <label>
+            Ruta ficha (editable)
+            <input id="pPdfPath" placeholder="assets/fichas/archivo.pdf" />
+          </label>
+        </div>
+
+        <div class="row">
+          <button class="btn btn--primary" type="submit">Agregar / Actualizar</button>
+          <button class="btn" type="button" id="btnProdClear">Limpiar</button>
+        </div>
+      </form>
+
+      <div id="prodList" class="list"></div>
     </section>
 
-    <section id="contacto" class="section">
-      <div class="wrap contact">
-        <div class="contact__box">
-          <h2>Contacto</h2>
-          <p class="muted">Cotiza en 1 minuto por WhatsApp.</p>
-          <div class="contact__btns">
-            <a class="btn btn--wa" id="waContact1" target="_blank" rel="noopener">WhatsApp principal</a>
-            <a class="btn btn--ghost" id="waContact2" target="_blank" rel="noopener">WhatsApp alterno</a>
-          </div>
-        </div>
-        <div class="contact__box">
-          <h3>Archivos</h3>
-          <p class="muted">
-            Las fichas técnicas se descargan desde <code>assets/fichas/</code>.
-            Las imágenes se cargan desde <code>assets/img/</code>.
-          </p>
-        </div>
-      </div>
+    <section class="card card--full">
+      <h2>Publicación</h2>
+      <ol class="muted">
+        <li>Sube imágenes a <code>/assets/img/</code> y PDFs a <code>/assets/fichas/</code>.</li>
+        <li>Entra a <code>/admin/</code> para editar.</li>
+        <li>Pulsa <strong>Guardar en servidor</strong> para actualizar <code>/data/products.json</code>.</li>
+        <li>Si tu hosting no permite escritura, usa <strong>Exportar</strong> y reemplaza el archivo manualmente.</li>
+      </ol>
     </section>
   </main>
 
-  <!-- Modal producto -->
-  <div class="modal" id="modal" aria-hidden="true">
-    <div class="modal__backdrop" data-close="1"></div>
-    <div class="modal__dialog" role="dialog" aria-modal="true" aria-label="Detalle de producto">
-      <button class="modal__close" type="button" data-close="1" aria-label="Cerrar">×</button>
-      <div class="modal__content" id="modalContent"></div>
-    </div>
-  </div>
-
-  <!-- Botón flotante WhatsApp -->
-  <a class="fab" id="waFab" target="_blank" rel="noopener" aria-label="WhatsApp">
-    <span>WhatsApp</span>
-  </a>
-
-  <footer class="footer">
-    <div class="wrap footer__inner">
-      <small>© <span id="year"></span> Innovación de Sillas y Muebles</small>
-      <small class="muted">Admin: <code>/admin</code></small>
-    </div>
-  </footer>
-
-  <script src="assets/js/app.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
