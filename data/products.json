@@ -18,6 +18,16 @@
       "datasheet": "assets/fichas/silla-nordica.pdf"
     },
     {
+      "id": "silla-antua-01",
+      "name": "Silla Anua Modelo N1",
+      "categoryId": "sillas",
+      "price": 100,
+      "shortDesc": "Silla Antua.",
+      "features": ["Estructura resistente", "Fácil limpieza", "Colores disponibles"],
+      "image": "assets/img/silla-antua.jpg",
+      "datasheet": "assets/fichas/silla-antua.pdf"
+    },
+    {
       "id": "banco-alto-01",
       "name": "Banco Alto Modelo B1",
       "categoryId": "bancos",
