@@ -1,4 +1,5 @@
-const STORAGE_KEY = "ism_db_v1";
+const STORAGE_KEY = "ism_db_v3";
+const DATA_URL = "../data/products.json"; // desde /admin hacia /data
 
 const DEFAULT_DB = {
   categories: [
@@ -14,19 +15,7 @@ const DEFAULT_DB = {
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
 
-let DB = loadDB();
-
-function loadDB(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : structuredClone(DEFAULT_DB);
-  }catch{
-    return structuredClone(DEFAULT_DB);
-  }
-}
-function saveDB(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB, null, 2));
-}
+let DB = null;
 
 function slugify(s){
   return String(s||"")
@@ -37,14 +26,37 @@ function slugify(s){
     .replace(/-+/g,"-");
 }
 
+function loadFromLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch{
+    return null;
+  }
+}
+
+function saveToLocal(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB, null, 2));
+}
+
+async function fetchJson(){
+  const res = await fetch(DATA_URL, { cache: "no-store" });
+  if(!res.ok) throw new Error("No se pudo cargar " + DATA_URL);
+  const data = await res.json();
+  return {
+    categories: Array.isArray(data.categories) ? data.categories : [],
+    products: Array.isArray(data.products) ? data.products : []
+  };
+}
+
 function refreshCatSelect(){
   const sel = $("#pCat");
-  sel.innerHTML = DB.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+  sel.innerHTML = (DB.categories || []).map(c => `<option value="${c.id}">${c.name}</option>`).join("");
 }
 
 function renderCats(){
   const box = $("#catList");
-  box.innerHTML = DB.categories.map(c => `
+  box.innerHTML = (DB.categories || []).map(c => `
     <div class="item">
       <div class="item__top">
         <div>
@@ -52,8 +64,8 @@ function renderCats(){
           <div class="item__meta"><strong>ID:</strong> ${c.id}</div>
         </div>
         <div class="item__actions">
-          <button class="btn" data-edit-cat="${c.id}">Editar</button>
-          <button class="btn" data-del-cat="${c.id}">Eliminar</button>
+          <button class="btn" type="button" data-edit-cat="${c.id}">Editar</button>
+          <button class="btn" type="button" data-del-cat="${c.id}">Eliminar</button>
         </div>
       </div>
     </div>
@@ -65,6 +77,18 @@ function renderCats(){
 
 function renderProducts(){
   const box = $("#prodList");
+
+  if(!DB.products || DB.products.length === 0){
+    box.innerHTML = `
+      <div class="item">
+        <div class="item__meta">
+          No hay productos aún. Crea uno arriba o importa <code>data/products.json</code>.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   box.innerHTML = DB.products.map(p => {
     const cat = DB.categories.find(x => x.id === p.categoryId);
     return `
@@ -73,7 +97,8 @@ function renderProducts(){
           <div>
             <h3 class="item__title">${p.name}</h3>
             <div class="item__meta">
-              <strong>ID:</strong> ${p.id} · <strong>Categoría:</strong> ${cat ? cat.name : p.categoryId}
+              <strong>ID:</strong> ${p.id}
+              · <strong>Categoría:</strong> ${cat ? cat.name : p.categoryId}
               · <strong>Precio:</strong> ${Number(p.price||0) ? p.price : "Cotizar"}
             </div>
             <div class="item__meta">
@@ -81,8 +106,8 @@ function renderProducts(){
             </div>
           </div>
           <div class="item__actions">
-            <button class="btn" data-edit-prod="${p.id}">Editar</button>
-            <button class="btn" data-del-prod="${p.id}">Eliminar</button>
+            <button class="btn" type="button" data-edit-prod="${p.id}">Editar</button>
+            <button class="btn" type="button" data-del-prod="${p.id}">Eliminar</button>
           </div>
         </div>
       </div>
@@ -100,15 +125,15 @@ function editCat(id){
   $("#catName").value = c.name;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 function delCat(id){
-  // evitar borrar si hay productos usando la categoría
   const used = DB.products.some(p => p.categoryId === id);
   if(used){
     alert("No se puede eliminar: hay productos usando esta categoría.");
     return;
   }
   DB.categories = DB.categories.filter(x => x.id !== id);
-  saveDB();
+  saveToLocal();
   refreshCatSelect();
   renderCats();
 }
@@ -136,7 +161,7 @@ function editProd(id){
 
 function delProd(id){
   DB.products = DB.products.filter(x => x.id !== id);
-  saveDB();
+  saveToLocal();
   renderProducts();
 }
 
@@ -156,15 +181,16 @@ function handleFileHints(){
   $("#pImg").addEventListener("change", (e) => {
     const f = e.target.files?.[0];
     if(!f) return;
-    const name = slugify(f.name.replace(/\.[^.]+$/, "")) + "." + f.name.split(".").pop().toLowerCase();
-    $("#pImgPath").value = `assets/img/${name}`;
+    const ext = f.name.split(".").pop().toLowerCase();
+    const base = slugify(f.name.replace(/\.[^.]+$/, ""));
+    $("#pImgPath").value = `assets/img/${base}.${ext}`;
   });
 
   $("#pPdf").addEventListener("change", (e) => {
     const f = e.target.files?.[0];
     if(!f) return;
-    const name = slugify(f.name.replace(/\.[^.]+$/, "")) + ".pdf";
-    $("#pPdfPath").value = `assets/fichas/${name}`;
+    const base = slugify(f.name.replace(/\.[^.]+$/, ""));
+    $("#pPdfPath").value = `assets/fichas/${base}.pdf`;
   });
 }
 
@@ -180,6 +206,63 @@ function exportJson(){
   URL.revokeObjectURL(url);
 }
 
+async function importJson(force=false){
+  try{
+    const imported = await fetchJson();
+    if(force){
+      DB = imported;
+      if(!DB.categories?.length) DB.categories = structuredClone(DEFAULT_DB.categories);
+      if(!DB.products) DB.products = [];
+      saveToLocal();
+    }else{
+      if(!loadFromLocal()){
+        DB = imported;
+        if(!DB.categories?.length) DB.categories = structuredClone(DEFAULT_DB.categories);
+        if(!DB.products) DB.products = [];
+        saveToLocal();
+      }
+    }
+
+    refreshCatSelect();
+    renderCats();
+    renderProducts();
+    alert("Importación lista ✅");
+  }catch(err){
+    console.error(err);
+    alert("No se pudo importar products.json. Revisa que exista: " + DATA_URL);
+  }
+}
+
+async function saveToServer(){
+  try{
+    const key = ($("#adminKey")?.value || "").trim();
+    if(!key){
+      alert("Ingresa la clave de admin para guardar en servidor.");
+      return;
+    }
+
+    const res = await fetch("save.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-ADMIN-KEY": key
+      },
+      body: JSON.stringify(DB)
+    });
+
+    const out = await res.json().catch(() => ({}));
+
+    if(!res.ok || !out.ok){
+      throw new Error(out.error || "Error guardando");
+    }
+
+    alert("Guardado en servidor ✅ (data/products.json actualizado)");
+  }catch(err){
+    console.error(err);
+    alert("No se pudo guardar en servidor.\n- Revisa la clave\n- Revisa permisos de /data/products.json\n\nDetalle: " + err.message);
+  }
+}
+
 function bindForms(){
   $("#catForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -188,13 +271,10 @@ function bindForms(){
     if(!id || !name) return;
 
     const existing = DB.categories.find(x => x.id === id);
-    if(existing){
-      existing.name = name;
-    }else{
-      DB.categories.push({ id, name });
-    }
+    if(existing) existing.name = name;
+    else DB.categories.push({ id, name });
 
-    saveDB();
+    saveToLocal();
     refreshCatSelect();
     renderCats();
     clearCatForm();
@@ -216,28 +296,46 @@ function bindForms(){
     const image = $("#pImgPath").value.trim();
     const datasheet = $("#pPdfPath").value.trim();
 
-    if(!id || !name || !categoryId) return;
+    if(!id || !name || !categoryId){
+      alert("Completa ID, Nombre y Categoría.");
+      return;
+    }
 
     const payload = { id, name, categoryId, price, shortDesc, features, image, datasheet };
 
     const existing = DB.products.find(x => x.id === id);
-    if(existing){
-      Object.assign(existing, payload);
-    }else{
-      DB.products.push(payload);
-    }
+    if(existing) Object.assign(existing, payload);
+    else DB.products.push(payload);
 
-    saveDB();
+    saveToLocal();
     renderProducts();
     clearProdForm();
   });
 
   $("#btnCatClear").onclick = clearCatForm;
   $("#btnProdClear").onclick = clearProdForm;
+
   $("#btnExport").onclick = exportJson;
+  $("#btnImport").onclick = () => importJson(true);
+  $("#btnSaveServer").onclick = saveToServer;
 }
 
-function init(){
+async function init(){
+  const local = loadFromLocal();
+  if(local){
+    DB = local;
+  }else{
+    try{
+      DB = await fetchJson();
+      if(!DB.categories?.length) DB.categories = structuredClone(DEFAULT_DB.categories);
+      if(!DB.products) DB.products = [];
+      saveToLocal();
+    }catch{
+      DB = structuredClone(DEFAULT_DB);
+      saveToLocal();
+    }
+  }
+
   refreshCatSelect();
   renderCats();
   renderProducts();
