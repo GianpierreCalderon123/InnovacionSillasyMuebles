@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin | Innovación de Sillas y Muebles</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap bar__inner">
+      <div>
+        <h1>Admin</h1>
+        <p class="muted">Crea categorías y productos. Luego exporta <code>products.json</code>.</p>
+      </div>
+      <div class="bar__actions">
+        <a class="btn" href="../">← Volver a la web</a>
+        <button class="btn btn--primary" id="btnExport">Exportar products.json</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <section class="card">
+      <h2>Categorías</h2>
+
+      <form id="catForm" class="form">
+        <label>
+          ID (url-friendly)
+          <input id="catId" placeholder="ej: sillas-oficina" required />
+        </label>
+        <label>
+          Nombre
+          <input id="catName" placeholder="Sillas de oficina" required />
+        </label>
+        <div class="row">
+          <button class="btn btn--primary" type="submit">Agregar / Actualizar</button>
+          <button class="btn" type="button" id="btnCatClear">Limpiar</button>
+        </div>
+      </form>
+
+      <div id="catList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Productos</h2>
+
+      <form id="prodForm" class="form">
+        <label>
+          ID (único)
+          <input id="pId" placeholder="ej: silla-nordica-01" required />
+        </label>
+
+        <label>
+          Nombre
+          <input id="pName" placeholder="Silla Nórdica Modelo N1" required />
+        </label>
+
+        <div class="two">
+          <label>
+            Categoría
+            <select id="pCat"></select>
+          </label>
+          <label>
+            Precio (PEN) (0 = Cotizar)
+            <input id="pPrice" type="number" min="0" step="1" value="0" />
+          </label>
+        </div>
+
+        <label>
+          Descripción corta
+          <textarea id="pDesc" rows="2" placeholder="Breve descripción del producto"></textarea>
+        </label>
+
+        <label>
+          Características (una por línea)
+          <textarea id="pFeat" rows="4" placeholder="Estructura resistente&#10;Fácil limpieza&#10;..."></textarea>
+        </label>
+
+        <div class="two">
+          <label>
+            Imagen (se guardará la ruta en JSON)
+            <input id="pImg" type="file" accept="image/*" />
+            <small class="muted">Copia el archivo a <code>assets/img/</code> y usa el nombre sugerido abajo.</small>
+          </label>
+
+          <label>
+            Ficha técnica (PDF)
+            <input id="pPdf" type="file" accept="application/pdf" />
+            <small class="muted">Copia el PDF a <code>assets/fichas/</code>.</small>
+          </label>
+        </div>
+
+        <div class="two">
+          <label>
+            Ruta imagen (editable)
+            <input id="pImgPath" placeholder="assets/img/archivo.jpg" />
+          </label>
+          <label>
+            Ruta ficha (editable)
+            <input id="pPdfPath" placeholder="assets/fichas/archivo.pdf" />
+          </label>
+        </div>
+
+        <div class="row">
+          <button class="btn btn--primary" type="submit">Agregar / Actualizar</button>
+          <button class="btn" type="button" id="btnProdClear">Limpiar</button>
+        </div>
+      </form>
+
+      <div id="prodList" class="list"></div>
+    </section>
+
+    <section class="card card--full">
+      <h2>Cómo publicar</h2>
+      <ol class="muted">
+        <li>En tu hosting, sube toda la carpeta del proyecto.</li>
+        <li>Coloca imágenes en <code>assets/img/</code> y fichas en <code>assets/fichas/</code>.</li>
+        <li>En Admin, crea productos y categorías.</li>
+        <li>Haz clic en <strong>Exportar products.json</strong> y reemplaza <code>data/products.json</code> con el archivo exportado.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
