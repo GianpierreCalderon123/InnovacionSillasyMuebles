@@ -4,23 +4,45 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin | Innovación de Sillas y Muebles</title>
-  <link rel="stylesheet" href="admin/admin.css" />
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
   <header class="bar">
     <div class="wrap bar__inner">
       <div>
         <h1>Admin</h1>
-        <p class="muted">Crea categorías y productos. Luego exporta <code>products.json</code>.</p>
+        <p class="muted">
+          Importa, edita y guarda <code>data/products.json</code> (vía PHP).
+        </p>
       </div>
+
       <div class="bar__actions">
         <a class="btn" href="../">← Volver a la web</a>
-        <button class="btn btn--primary" id="btnExport">Exportar products.json</button>
+        <button class="btn" id="btnImport" type="button">Importar products.json</button>
+        <button class="btn btn--primary" id="btnSaveServer" type="button">Guardar en servidor</button>
+        <button class="btn" id="btnExport" type="button">Exportar products.json</button>
       </div>
     </div>
   </header>
 
   <main class="wrap grid">
+    <section class="card card--full">
+      <h2>Seguridad</h2>
+      <p class="muted">Clave requerida para guardar en servidor (validada por <code>save.php</code>).</p>
+      <div class="two">
+        <label>
+          Clave de admin
+          <input id="adminKey" type="password" placeholder="Ingresa tu clave" />
+        </label>
+        <div class="hintBox">
+          <div class="hintTitle">Tip</div>
+          <div class="muted">
+            Si no quieres clave, puedo darte la versión abierta.
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <h2>Categorías</h2>
 
@@ -69,25 +91,23 @@
 
         <label>
           Descripción corta
-          <textarea id="pDesc" rows="2" placeholder="Breve descripción del producto"></textarea>
+          <textarea id="pDesc" rows="2"></textarea>
         </label>
 
         <label>
           Características (una por línea)
-          <textarea id="pFeat" rows="4" placeholder="Estructura resistente&#10;Fácil limpieza&#10;..."></textarea>
+          <textarea id="pFeat" rows="4"></textarea>
         </label>
 
         <div class="two">
           <label>
-            Imagen (se guardará la ruta en JSON)
+            Imagen (solo sugiere ruta)
             <input id="pImg" type="file" accept="image/*" />
-            <small class="muted">Copia el archivo a <code>assets/img/</code> y usa el nombre sugerido abajo.</small>
           </label>
 
           <label>
             Ficha técnica (PDF)
             <input id="pPdf" type="file" accept="application/pdf" />
-            <small class="muted">Copia el PDF a <code>assets/fichas/</code>.</small>
           </label>
         </div>
 
@@ -110,18 +130,8 @@
 
       <div id="prodList" class="list"></div>
     </section>
-
-    <section class="card card--full">
-      <h2>Cómo publicar</h2>
-      <ol class="muted">
-        <li>En tu hosting, sube toda la carpeta del proyecto.</li>
-        <li>Coloca imágenes en <code>assets/img/</code> y fichas en <code>assets/fichas/</code>.</li>
-        <li>En Admin, crea productos y categorías.</li>
-        <li>Haz clic en <strong>Exportar products.json</strong> y reemplaza <code>data/products.json</code> con el archivo exportado.</li>
-      </ol>
-    </section>
   </main>
 
-  <script src="admin/admin.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
