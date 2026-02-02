@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Innovación de Sillas y Muebles</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <a class="brand" href="./">
+        <span class="brand__logo">IS</span>
+        <span class="brand__text">
+          <strong>Innovación</strong><br><small>Sillas y Muebles</small>
+        </span>
+      </a>
+
+      <nav class="nav">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#nosotros">Nosotros</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="topbar__actions">
+        <a class="btn btn--ghost" href="admin/">Admin</a>
+        <a class="btn btn--wa" id="waTop" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero__inner">
+        <div class="hero__copy">
+          <h1>Sillas y muebles con estilo para hogar y oficina</h1>
+          <p>
+            Explora nuestro catálogo por categorías: <strong>Sillas</strong>, <strong>Bancos</strong>,
+            <strong>Mesas</strong>, <strong>Sillas de oficina</strong> y <strong>Butacas</strong>.
+          </p>
+
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#catalogo">Ver catálogo</a>
+            <a class="btn btn--ghost" id="waHero" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+          </div>
+
+          <div class="hero__chips" id="chipRow"></div>
+        </div>
+
+        <div class="hero__card">
+          <div class="hero__cardTop">
+            <span class="pill">Atención rápida</span>
+            <span class="pill pill--soft">Envíos / recojo</span>
+          </div>
+          <div class="hero__cardBody">
+            <h3>¿Necesitas asesoría?</h3>
+            <p>Envíanos el modelo por WhatsApp y te respondemos con stock, colores y ficha técnica.</p>
+            <div class="hero__cardBtns">
+              <a class="btn btn--wa" id="waCard1" target="_blank" rel="noopener">WhatsApp principal</a>
+              <a class="btn btn--ghost" id="waCard2" target="_blank" rel="noopener">WhatsApp alterno</a>
+            </div>
+            <small class="muted">
+              *Si el número alterno no es +51, edítalo en <code>assets/js/app.js</code>.
+            </small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalogo" class="section">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <h2>Catálogo</h2>
+            <p class="muted">Filtra por categoría o busca por nombre.</p>
+          </div>
+
+          <div class="filters">
+            <div class="search">
+              <input id="q" type="search" placeholder="Buscar… (ej: taburete, mesa, gerencial)" />
+            </div>
+            <select id="catSelect" aria-label="Categoría">
+              <option value="all">Todas las categorías</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="grid" class="grid"></div>
+
+        <div id="empty" class="empty hidden">
+          <h3>No encontramos productos</h3>
+          <p class="muted">Prueba con otra búsqueda o selecciona otra categoría.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="nosotros" class="section section--soft">
+      <div class="wrap">
+        <h2>Nosotros</h2>
+        <p>
+          En <strong>Innovación de Sillas y Muebles</strong> nos enfocamos en mobiliario funcional,
+          resistente y con buen diseño para hogar, restaurantes y oficina.
+        </p>
+      </div>
+    </section>
+
+    <section id="contacto" class="section">
+      <div class="wrap contact">
+        <div class="contact__box">
+          <h2>Contacto</h2>
+          <p class="muted">Cotiza en 1 minuto por WhatsApp.</p>
+          <div class="contact__btns">
+            <a class="btn btn--wa" id="waContact1" target="_blank" rel="noopener">WhatsApp principal</a>
+            <a class="btn btn--ghost" id="waContact2" target="_blank" rel="noopener">WhatsApp alterno</a>
+          </div>
+        </div>
+        <div class="contact__box">
+          <h3>Archivos</h3>
+          <p class="muted">
+            Las fichas técnicas se descargan desde <code>assets/fichas/</code>.
+            Las imágenes se cargan desde <code>assets/img/</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal producto -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close="1"></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-label="Detalle de producto">
+      <button class="modal__close" type="button" data-close="1" aria-label="Cerrar">×</button>
+      <div class="modal__content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Botón flotante WhatsApp -->
+  <a class="fab" id="waFab" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <span>WhatsApp</span>
+  </a>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <small>© <span id="year"></span> Innovación de Sillas y Muebles</small>
+      <small class="muted">Admin: <code>/admin</code></small>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
