@@ -1,5 +1,5 @@
 const STORAGE_KEY = "ism_db_v3";
-const DATA_URL = "../data/products.json"; // desde /admin hacia /data
+const DATA_URL = "../data/products.json";
 
 const DEFAULT_DB = {
   categories: [
@@ -51,11 +51,14 @@ async function fetchJson(){
 
 function refreshCatSelect(){
   const sel = $("#pCat");
+  if(!sel) return;
   sel.innerHTML = (DB.categories || []).map(c => `<option value="${c.id}">${c.name}</option>`).join("");
 }
 
 function renderCats(){
   const box = $("#catList");
+  if(!box) return;
+
   box.innerHTML = (DB.categories || []).map(c => `
     <div class="item">
       <div class="item__top">
@@ -77,6 +80,7 @@ function renderCats(){
 
 function renderProducts(){
   const box = $("#prodList");
+  if(!box) return;
 
   if(!DB.products || DB.products.length === 0){
     box.innerHTML = `
@@ -121,8 +125,10 @@ function renderProducts(){
 function editCat(id){
   const c = DB.categories.find(x => x.id === id);
   if(!c) return;
-  $("#catId").value = c.id;
-  $("#catName").value = c.name;
+  const idEl = $("#catId");
+  const nameEl = $("#catName");
+  if(idEl) idEl.value = c.id;
+  if(nameEl) nameEl.value = c.name;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -139,8 +145,10 @@ function delCat(id){
 }
 
 function clearCatForm(){
-  $("#catId").value = "";
-  $("#catName").value = "";
+  const idEl = $("#catId");
+  const nameEl = $("#catName");
+  if(idEl) idEl.value = "";
+  if(nameEl) nameEl.value = "";
 }
 
 function editProd(id){
@@ -166,32 +174,36 @@ function delProd(id){
 }
 
 function clearProdForm(){
-  $("#pId").value = "";
-  $("#pName").value = "";
-  $("#pPrice").value = 0;
-  $("#pDesc").value = "";
-  $("#pFeat").value = "";
-  $("#pImg").value = "";
-  $("#pPdf").value = "";
-  $("#pImgPath").value = "";
-  $("#pPdfPath").value = "";
+  ["pId","pName","pDesc","pFeat","pImg","pPdf","pImgPath","pPdfPath"].forEach(id=>{
+    const el = $("#"+id);
+    if(el) el.value = "";
+  });
+  const price = $("#pPrice");
+  if(price) price.value = 0;
 }
 
 function handleFileHints(){
-  $("#pImg").addEventListener("change", (e) => {
-    const f = e.target.files?.[0];
-    if(!f) return;
-    const ext = f.name.split(".").pop().toLowerCase();
-    const base = slugify(f.name.replace(/\.[^.]+$/, ""));
-    $("#pImgPath").value = `assets/img/${base}.${ext}`;
-  });
-
-  $("#pPdf").addEventListener("change", (e) => {
-    const f = e.target.files?.[0];
-    if(!f) return;
-    const base = slugify(f.name.replace(/\.[^.]+$/, ""));
-    $("#pPdfPath").value = `assets/fichas/${base}.pdf`;
-  });
+  const pImg = $("#pImg");
+  const pPdf = $("#pPdf");
+  if(pImg){
+    pImg.addEventListener("change", (e) => {
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const ext = f.name.split(".").pop().toLowerCase();
+      const base = slugify(f.name.replace(/\.[^.]+$/, ""));
+      const p = $("#pImgPath");
+      if(p) p.value = `assets/img/${base}.${ext}`;
+    });
+  }
+  if(pPdf){
+    pPdf.addEventListener("change", (e) => {
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const base = slugify(f.name.replace(/\.[^.]+$/, ""));
+      const p = $("#pPdfPath");
+      if(p) p.value = `assets/fichas/${base}.pdf`;
+    });
+  }
 }
 
 function exportJson(){
@@ -206,7 +218,7 @@ function exportJson(){
   URL.revokeObjectURL(url);
 }
 
-async function importJson(force=false){
+async function importJson(force=true){
   try{
     const imported = await fetchJson();
     if(force){
@@ -214,22 +226,14 @@ async function importJson(force=false){
       if(!DB.categories?.length) DB.categories = structuredClone(DEFAULT_DB.categories);
       if(!DB.products) DB.products = [];
       saveToLocal();
-    }else{
-      if(!loadFromLocal()){
-        DB = imported;
-        if(!DB.categories?.length) DB.categories = structuredClone(DEFAULT_DB.categories);
-        if(!DB.products) DB.products = [];
-        saveToLocal();
-      }
     }
-
     refreshCatSelect();
     renderCats();
     renderProducts();
     alert("Importación lista ✅");
   }catch(err){
     console.error(err);
-    alert("No se pudo importar products.json. Revisa que exista: " + DATA_URL);
+    alert("No se pudo importar products.json: " + err.message);
   }
 }
 
@@ -237,7 +241,7 @@ async function saveToServer(){
   try{
     const key = ($("#adminKey")?.value || "").trim();
     if(!key){
-      alert("Ingresa la clave de admin para guardar en servidor.");
+      alert("Ingresa la clave de admin.");
       return;
     }
 
@@ -256,68 +260,79 @@ async function saveToServer(){
       throw new Error(out.error || "Error guardando");
     }
 
-    alert("Guardado en servidor ✅ (data/products.json actualizado)");
+    alert("Guardado en servidor ✅");
   }catch(err){
     console.error(err);
-    alert("No se pudo guardar en servidor.\n- Revisa la clave\n- Revisa permisos de /data/products.json\n\nDetalle: " + err.message);
+    alert("No se pudo guardar: " + err.message + "\nRevisa clave y permisos de /data/products.json");
   }
 }
 
 function bindForms(){
-  $("#catForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const id = slugify($("#catId").value);
-    const name = $("#catName").value.trim();
-    if(!id || !name) return;
+  const catForm = $("#catForm");
+  const prodForm = $("#prodForm");
 
-    const existing = DB.categories.find(x => x.id === id);
-    if(existing) existing.name = name;
-    else DB.categories.push({ id, name });
+  if(catForm){
+    catForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = slugify($("#catId").value);
+      const name = $("#catName").value.trim();
+      if(!id || !name) return;
 
-    saveToLocal();
-    refreshCatSelect();
-    renderCats();
-    clearCatForm();
-  });
+      const existing = DB.categories.find(x => x.id === id);
+      if(existing) existing.name = name;
+      else DB.categories.push({ id, name });
 
-  $("#prodForm").addEventListener("submit", (e) => {
-    e.preventDefault();
+      saveToLocal();
+      refreshCatSelect();
+      renderCats();
+      clearCatForm();
+    });
+  }
 
-    const id = slugify($("#pId").value);
-    const name = $("#pName").value.trim();
-    const categoryId = $("#pCat").value;
-    const price = Number($("#pPrice").value || 0);
-    const shortDesc = $("#pDesc").value.trim();
-    const features = $("#pFeat").value
-      .split("\n")
-      .map(x => x.trim())
-      .filter(Boolean);
+  if(prodForm){
+    prodForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const image = $("#pImgPath").value.trim();
-    const datasheet = $("#pPdfPath").value.trim();
+      const id = slugify($("#pId").value);
+      const name = $("#pName").value.trim();
+      const categoryId = $("#pCat").value;
+      const price = Number($("#pPrice").value || 0);
+      const shortDesc = $("#pDesc").value.trim();
+      const features = $("#pFeat").value.split("\n").map(x => x.trim()).filter(Boolean);
+      const image = $("#pImgPath").value.trim();
+      const datasheet = $("#pPdfPath").value.trim();
 
-    if(!id || !name || !categoryId){
-      alert("Completa ID, Nombre y Categoría.");
-      return;
-    }
+      if(!id || !name || !categoryId){
+        alert("Completa ID, Nombre y Categoría.");
+        return;
+      }
 
-    const payload = { id, name, categoryId, price, shortDesc, features, image, datasheet };
+      const payload = { id, name, categoryId, price, shortDesc, features, image, datasheet };
 
-    const existing = DB.products.find(x => x.id === id);
-    if(existing) Object.assign(existing, payload);
-    else DB.products.push(payload);
+      const existing = DB.products.find(x => x.id === id);
+      if(existing) Object.assign(existing, payload);
+      else DB.products.push(payload);
 
-    saveToLocal();
-    renderProducts();
-    clearProdForm();
-  });
+      saveToLocal();
+      renderProducts();
+      clearProdForm();
+    });
+  }
 
-  $("#btnCatClear").onclick = clearCatForm;
-  $("#btnProdClear").onclick = clearProdForm;
+  const btnCatClear = $("#btnCatClear");
+  if(btnCatClear) btnCatClear.onclick = clearCatForm;
 
-  $("#btnExport").onclick = exportJson;
-  $("#btnImport").onclick = () => importJson(true);
-  $("#btnSaveServer").onclick = saveToServer;
+  const btnProdClear = $("#btnProdClear");
+  if(btnProdClear) btnProdClear.onclick = clearProdForm;
+
+  const btnExport = $("#btnExport");
+  if(btnExport) btnExport.onclick = exportJson;
+
+  const btnImport = $("#btnImport");
+  if(btnImport) btnImport.onclick = () => importJson(true);
+
+  const btnSaveServer = $("#btnSaveServer");
+  if(btnSaveServer) btnSaveServer.onclick = saveToServer;
 }
 
 async function init(){
