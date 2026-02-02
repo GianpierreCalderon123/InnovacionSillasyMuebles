@@ -1,0 +1,61 @@
+{
+  "categories": [
+    { "id": "sillas", "name": "Sillas" },
+    { "id": "bancos", "name": "Bancos" },
+    { "id": "mesas", "name": "Mesas" },
+    { "id": "sillas-oficina", "name": "Sillas de oficina" },
+    { "id": "butacas", "name": "Butacas" }
+  ],
+  "products": [
+    {
+      "id": "silla-nordica-01",
+      "name": "Silla Nórdica Modelo N1",
+      "categoryId": "sillas",
+      "price": 0,
+      "shortDesc": "Silla moderna ideal para comedor.",
+      "features": ["Estructura resistente", "Fácil limpieza", "Colores disponibles"],
+      "image": "assets/img/silla-nordica.jpg",
+      "datasheet": "assets/fichas/silla-nordica.pdf"
+    },
+    {
+      "id": "banco-alto-01",
+      "name": "Banco Alto Modelo B1",
+      "categoryId": "bancos",
+      "price": 0,
+      "shortDesc": "Banco alto para barra / cocina.",
+      "features": ["Base metálica", "Asiento acolchado"],
+      "image": "assets/img/banco-alto.jpg",
+      "datasheet": "assets/fichas/banco-alto.pdf"
+    },
+    {
+      "id": "mesa-comedor-01",
+      "name": "Mesa Comedor Modelo M1",
+      "categoryId": "mesas",
+      "price": 0,
+      "shortDesc": "Mesa para 4–6 personas (según medida).",
+      "features": ["Tablero melamina", "Estructura firme"],
+      "image": "assets/img/mesa-comedor.jpg",
+      "datasheet": "assets/fichas/mesa-comedor.pdf"
+    },
+    {
+      "id": "oficina-ergonomica-01",
+      "name": "Silla Ergonómica Oficina E1",
+      "categoryId": "sillas-oficina",
+      "price": 0,
+      "shortDesc": "Respaldo alto y soporte lumbar.",
+      "features": ["Altura regulable", "Base con ruedas", "Soporte lumbar"],
+      "image": "assets/img/silla-oficina.jpg",
+      "datasheet": "assets/fichas/silla-oficina.pdf"
+    },
+    {
+      "id": "butaca-01",
+      "name": "Butaca Modelo BT1",
+      "categoryId": "butacas",
+      "price": 0,
+      "shortDesc": "Butaca para sala/recepción.",
+      "features": ["Acolchado premium", "Diseño moderno"],
+      "image": "assets/img/butaca.jpg",
+      "datasheet": "assets/fichas/butaca.pdf"
+    }
+  ]
+}
