@@ -2,7 +2,7 @@
 header("Content-Type: application/json; charset=utf-8");
 
 // ====== CONFIG ======
-$ADMIN_KEY = "CAMBIAESTO"; // <-- CAMBIA esta clave
+$ADMIN_KEY = "ANTUA"; // <-- CAMBIA esta clave
 // ====================
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
